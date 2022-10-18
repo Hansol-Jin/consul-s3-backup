@@ -1,5 +1,5 @@
 # Set the base image
-FROM postgres:13.7-alpine
+FROM consul:1.13.2
 
 RUN apk -v --update add \
         py-pip \

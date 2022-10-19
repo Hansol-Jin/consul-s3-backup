@@ -10,13 +10,13 @@ for CURRENT_DATABASE in ${TARGET_DATABASE_NAMES//,/ }
 do
 BACKUPFILES="$CURRENT_DATABASE"_"backup"_"$current_date"
     # Perform the database backup. Put the output to a variable. If successful upload the backup to S3, if unsuccessful print an entry to the console and the log, and set has_failed to true.
-    if sqloutput=$(consul snapshot save -http-addr=$TARGET_DATABASE_HOST:$TARGET_DATABASE_PORT 2>&1 > /tmp/$CURRENT_DATABASE_$current_date.sql)
+    if sqloutput=$(consul snapshot save -http-addr=$TARGET_DATABASE_HOST:$TARGET_DATABASE_PORT /tmp/$CURRENT_DATABASE_$current_date.snap)
     then
         
         echo -e "Database backup successfully completed for $CURRENT_DATABASE at $(TZ='Asia/Seoul' date +'%Y-%m-%d %H:%M:%S')."
 
         # Perform the upload to S3. Put the output to a variable. If successful, print an entry to the console and the log. If unsuccessful, set has_failed to true and print an entry to the console and the log
-        if awsoutput=$(aws s3 cp /tmp/$CURRENT_DATABASE_$current_date.sql s3://$AWS_BUCKET_NAME$AWS_BUCKET_BACKUP_PATH/$BACKUPFILES.sql 2>&1)
+        if awsoutput=$(aws s3 cp /tmp/$CURRENT_DATABASE_$current_date.snap s3://$AWS_BUCKET_NAME$AWS_BUCKET_BACKUP_PATH/$BACKUPFILES.snap 2>&1)
         then
             echo -e "Database backup successfully uploaded for $CURRENT_DATABASE at $(TZ='Asia/Seoul' date +'%Y-%m-%d %H:%M:%S')."
         else
